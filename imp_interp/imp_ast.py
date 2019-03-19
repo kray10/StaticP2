@@ -89,6 +89,17 @@ class WhileStatement(Statement):
             self.body.eval(env)
             condition_value = self.condition.eval(env)
 
+# added skip statement to class definition
+class SkipStatement(Statement):
+    def __init__(self):
+        self.value = "skip"
+
+    def __repr__(self):
+        return 'SkipStatement()'
+
+    def eval(self, env):
+        pass
+
 class IntAexp(Aexp):
     def __init__(self, i):
         self.i = i

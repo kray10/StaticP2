@@ -15,6 +15,7 @@ def main(args):
     print(ast)
 
 
+
 def generateAST(filepath):
     imp_text = open(filepath).read()
     tokens = imp_lex(imp_text)
