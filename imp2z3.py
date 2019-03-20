@@ -12,7 +12,15 @@ def main(args):
     if not ast:
         sys.stderr.write("File could not be parsed")
         sys.exit(1)
-    print(ast)
+
+    vars = set({})
+    ast.getVars(vars)
+    vars = sorted(vars)
+    print(vars)
+    labels = {'L?'}
+    ast.assignLabels(labels)
+    labels = sorted(labels)
+    print(labels)
 
 
 

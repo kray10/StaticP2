@@ -23,6 +23,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# Removed add eval functions as they are not necessary for reaching
 from .equality import *
 
 class Statement(Equality):
@@ -38,13 +39,21 @@ class AssignStatement(Statement):
     def __init__(self, name, aexp):
         self.name = name
         self.aexp = aexp
+        self.label = None
 
     def __repr__(self):
         return 'AssignStatement(%s, %s)' % (self.name, self.aexp)
 
-    def eval(self, env):
-        value = self.aexp.eval(env)
-        env[self.name] = value
+    def getVars(self, env):
+        env.add(self.name)
+        self.aexp.getVars(env)
+
+    def assignLabels(self, labels):
+        current = 1
+        while ('L' + str(current)) in labels:
+            current += 1
+        self.label = 'L' + str(current)
+        labels.add(self.label)
 
 class CompoundStatement(Statement):
     def __init__(self, first, second):
@@ -54,40 +63,61 @@ class CompoundStatement(Statement):
     def __repr__(self):
         return 'CompoundStatement(%s, %s)' % (self.first, self.second)
 
-    def eval(self, env):
-        self.first.eval(env)
-        self.second.eval(env)
+    def getVars(self, env):
+        self.first.getVars(env)
+        self.second.getVars(env)
+
+    def assignLabels(self, labels):
+        self.first.assignLabels(labels)
+        self.second.assignLabels(labels)
+
 
 class IfStatement(Statement):
     def __init__(self, condition, true_stmt, false_stmt):
         self.condition = condition
         self.true_stmt = true_stmt
         self.false_stmt = false_stmt
+        self.label = None
 
     def __repr__(self):
         return 'IfStatement(%s, %s, %s)' % (self.condition, self.true_stmt, self.false_stmt)
 
-    def eval(self, env):
-        condition_value = self.condition.eval(env)
-        if condition_value:
-            self.true_stmt.eval(env)
-        else:
-            if self.false_stmt:
-                self.false_stmt.eval(env)
+    def getVars(self, env):
+        self.condition.getVars(env)
+        self.true_stmt.getVars(env)
+        self.false_stmt.getVars(env)
+
+    def assignLabels(self, labels):
+        current = 1
+        while ('L' + str(current)) in labels:
+            current += 1
+        self.label = 'L' + str(current)
+        labels.add(self.label)
+        self.true_stmt.assignLabels(labels)
+        self.false_stmt.assignLabels(labels)
+
 
 class WhileStatement(Statement):
     def __init__(self, condition, body):
         self.condition = condition
         self.body = body
+        self.label = None
 
     def __repr__(self):
         return 'WhileStatement(%s, %s)' % (self.condition, self.body)
 
-    def eval(self, env):
-        condition_value = self.condition.eval(env)
-        while condition_value:
-            self.body.eval(env)
-            condition_value = self.condition.eval(env)
+    def getVars(self, env):
+        self.condition.getVars(env)
+        self.body.getVars(env)
+
+    def assignLabels(self, labels):
+        current = 1
+        while ('L' + str(current)) in labels:
+            current += 1
+        self.label = 'L' + str(current)
+        labels.add(self.label)
+        self.body.assignLabels(labels)
+
 
 # added skip statement to class definition
 class SkipStatement(Statement):
@@ -97,8 +127,9 @@ class SkipStatement(Statement):
     def __repr__(self):
         return 'SkipStatement()'
 
-    def eval(self, env):
+    def getVars(self, env):
         pass
+
 
 class IntAexp(Aexp):
     def __init__(self, i):
@@ -107,8 +138,9 @@ class IntAexp(Aexp):
     def __repr__(self):
         return 'IntAexp(%d)' % self.i
 
-    def eval(self, env):
-        return self.i
+    def getVars(self, env):
+        pass
+
 
 class VarAexp(Aexp):
     def __init__(self, name):
@@ -117,11 +149,9 @@ class VarAexp(Aexp):
     def __repr__(self):
         return 'VarAexp(%s)' % self.name
 
-    def eval(self, env):
-        if self.name in env:
-            return env[self.name]
-        else:
-            return 0
+    def getVars(self, env):
+        env.add(self.name)
+
 
 class BinopAexp(Aexp):
     def __init__(self, op, left, right):
@@ -132,20 +162,9 @@ class BinopAexp(Aexp):
     def __repr__(self):
         return 'BinopAexp(%s, %s, %s)' % (self.op, self.left, self.right)
 
-    def eval(self, env):
-        left_value = self.left.eval(env)
-        right_value = self.right.eval(env)
-        if self.op == '+':
-            value = left_value + right_value
-        elif self.op == '-':
-            value = left_value - right_value
-        elif self.op == '*':
-            value = left_value * right_value
-        elif self.op == '/':
-            value = left_value / right_value
-        else:
-            raise RuntimeError('unknown operator: ' + self.op)
-        return value
+    def getVars(self, env):
+        self.left.getVars(env)
+        self.right.getVars(env)
 
 class RelopBexp(Bexp):
     def __init__(self, op, left, right):
@@ -156,24 +175,11 @@ class RelopBexp(Bexp):
     def __repr__(self):
         return 'RelopBexp(%s, %s, %s)' % (self.op, self.left, self.right)
 
-    def eval(self, env):
-        left_value = self.left.eval(env)
-        right_value = self.right.eval(env)
-        if self.op == '<':
-            value = left_value < right_value
-        elif self.op == '<=':
-            value = left_value <= right_value
-        elif self.op == '>':
-            value = left_value > right_value
-        elif self.op == '>=':
-            value = left_value >= right_value
-        elif self.op == '=':
-            value = left_value == right_value
-        elif self.op == '!=':
-            value = left_value != right_value
-        else:
-            raise RuntimeError('unknown operator: ' + self.op)
-        return value
+    def getVars(self, env):
+        self.left.getVars(env)
+        self.right.getVars(env)
+
+
 
 class AndBexp(Bexp):
     def __init__(self, left, right):
@@ -183,10 +189,10 @@ class AndBexp(Bexp):
     def __repr__(self):
         return 'AndBexp(%s, %s)' % (self.left, self.right)
 
-    def eval(self, env):
-        left_value = self.left.eval(env)
-        right_value = self.right.eval(env)
-        return left_value and right_value
+    def getVars(self, env):
+        self.left.getVars(env)
+        self.right.getVars(env)
+
 
 class OrBexp(Bexp):
     def __init__(self, left, right):
@@ -196,10 +202,9 @@ class OrBexp(Bexp):
     def __repr__(self):
         return 'OrBexp(%s, %s)' % (self.left, self.right)
 
-    def eval(self, env):
-        left_value = self.left.eval(env)
-        right_value = self.right.eval(env)
-        return left_value or right_value
+    def getVars(self, env):
+        self.left.getVars(env)
+        self.right.getVars(env)
 
 class NotBexp(Bexp):
     def __init__(self, exp):
@@ -208,6 +213,5 @@ class NotBexp(Bexp):
     def __repr__(self):
         return 'NotBexp(%s)' % self.exp
 
-    def eval(self, env):
-        value = self.exp.eval(env)
-        return not value
+    def getVars(self, env):
+        self.exp.getVars(env)
