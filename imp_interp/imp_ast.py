@@ -132,6 +132,7 @@ class IfStatement(Statement):
         exit += self.label + " v!1 l!1) (or (Ex"
         exit += self.true_stmt.getLabel() + " v!1 l!1) (Ex"
         exit += self.false_stmt.getLabel() + " v!1 l!1)))))\n"
+        list.append(exit)
 
     def getLabel(self):
         return self.label
