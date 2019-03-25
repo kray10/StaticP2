@@ -1,0 +1,5 @@
+Y := a;
+Z := b;
+if 1 < Y then
+  Y := Y - 1
+end

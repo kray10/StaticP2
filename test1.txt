@@ -1,0 +1,13 @@
+Y := a;
+Z := b;
+while 1<Y do
+  Y := Y - 1
+end;
+Y := c;
+x := 12;
+X := d;
+if x > 1 then 
+    Y := x
+else 
+    Y := X
+end
