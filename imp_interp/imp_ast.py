@@ -133,7 +133,7 @@ class IfStatement(Statement):
         exit = "(assert (forall ((v!1 Var) (l!1 Lab))\n(= (Ex"
         exit += self.label + " v!1 l!1) (or (Ex"
         exit += self.true_stmt.getLabel() + " v!1 l!1) (Ex"
-        exit += self.false_stmt + " v!1 l!1)))))\n"
+        exit += self.false_stmt.getLabel() + " v!1 l!1)))))\n"
 
     def getLabel(self):
         return self.label
