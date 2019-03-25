@@ -55,12 +55,11 @@ class AssignStatement(Statement):
         self.label = str(current)
         labels.add(self.label)
 
-    def genZ3(self, list, prev=None):
-        if prev is not None:
-            ent = "(assert (forall ((v!1 Var) (l!1 Lab))\n(= (En"
-            ent += self.label + " v!1 l!1) (Ex"
-            ent += prev + " v!1 l!1))))\n"
-            list.append(ent)
+    def genZ3(self, list, prev):
+        ent = "(assert (forall ((v!1 Var) (l!1 Lab))\n(= (En"
+        ent += self.label + " v!1 l!1) (Ex"
+        ent += prev + " v!1 l!1))))\n"
+        list.append(ent)
 
         exit = "(assert (forall ((v!1 Var) (l!1 Lab))\n(ite (= v!1 "
         exit += self.name + ")\n(ite (= l!1 L"
@@ -90,7 +89,7 @@ class CompoundStatement(Statement):
         self.first.assignLabels(labels)
         self.second.assignLabels(labels)
 
-    def genZ3(self, list, prev=None):
+    def genZ3(self, list, prev):
         self.first.genZ3(list, prev)
         self.second.genZ3(list, self.first.getLabel())
 
@@ -122,12 +121,11 @@ class IfStatement(Statement):
         self.true_stmt.assignLabels(labels)
         self.false_stmt.assignLabels(labels)
 
-    def genZ3(self, list, prev=None):
-        if prev is not None:
-            ent = "(assert (forall ((v!1 Var) (l!1 Lab))\n(= (En"
-            ent += self.label + " v!1 l!1) (Ex"
-            ent += prev + " v!1 l!1))))\n"
-            list.append(ent)
+    def genZ3(self, list, prev):
+        ent = "(assert (forall ((v!1 Var) (l!1 Lab))\n(= (En"
+        ent += self.label + " v!1 l!1) (Ex"
+        ent += prev + " v!1 l!1))))\n"
+        list.append(ent)
         self.true_stmt.genZ3(list, self.label)
         self.false_stmt.genZ3(list, self.label)
         exit = "(assert (forall ((v!1 Var) (l!1 Lab))\n(= (Ex"
@@ -163,13 +161,12 @@ class WhileStatement(Statement):
     def getLabel(self):
         return self.label
 
-    def genZ3(self, list, prev=None):
-        if prev is not None:
-            ent = "(assert (forall ((v!1 Var) (l!1 Lab))\n(= (En"
-            ent += self.label + " v!1 l!1) (or (Ex"
-            ent += prev + " v!1 l!1) (Ex"
-            ent += self.body.getLabel() + " v!1 l!1)))))\n"
-            list.append(ent)
+    def genZ3(self, list, prev):
+        ent = "(assert (forall ((v!1 Var) (l!1 Lab))\n(= (En"
+        ent += self.label + " v!1 l!1) (or (Ex"
+        ent += prev + " v!1 l!1) (Ex"
+        ent += self.body.getLabel() + " v!1 l!1)))))\n"
+        list.append(ent)
         exit = "(assert (forall ((v!1 Var) (l!1 Lab))\n(= (Ex"
         exit += self.label + " v!1 l!1) (En"
         exit += self.label + " v!1 l!1))))\n"
@@ -199,11 +196,10 @@ class SkipStatement(Statement):
         return self.label
 
     def genZ3(self, list, prev=None):
-        if prev is not None:
-            ent = "(assert (forall ((v!1 Var) (l!1 Lab))\n(= (En"
-            ent += self.label + " v!1 l!1) (Ex"
-            ent += prev + " v!1 l!1))))\n"
-            list.append(ent)
+        ent = "(assert (forall ((v!1 Var) (l!1 Lab))\n(= (En"
+        ent += self.label + " v!1 l!1) (Ex"
+        ent += prev + " v!1 l!1))))\n"
+        list.append(ent)
         exit = "(assert (forall ((v!1 Var) (l!1 Lab))\n(= (Ex"
         exit += self.label + " v!1 l!1) (En"
         exit += self.label + " v!1 l!1))))\n"

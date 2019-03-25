@@ -46,9 +46,9 @@ def generateZ3(ast):
     # define datatypes and lebels
     z3.append(declareDataTypes("Var", vars))
     z3.append(declareDataTypes("Lab", labels))
-    z3.append(defineEn1(vars))
+    z3.append(defineEnEx0(vars))
     z3.append(declareEnAndEx(labels))
-    ast.genZ3(z3)
+    ast.genZ3(z3, "0")
     z3.append("(check-sat)\n")
     z3.append("(get-model)\n")
 
@@ -65,18 +65,21 @@ def declareDataTypes(type, names):
     str += ")))\n"
     return str
 
-def defineEn1(vars):
-    str = "(define-fun En1 ((v!1 Var) (l!1 Lab)) Bool\n(or "
+def defineEnEx0(vars):
+    str = "(define-fun En0 ((v!1 Var) (l!1 Lab)) Bool\n(or "
     for var in vars:
         str += "(and (= v!1 " + var + ") (= l!1 L?))\n"
-    str += "))\n"
+    str += "))\n\n"
+    str += "(declare-fun Ex0  (Var Lab) Bool)\n"
+    str += "(assert (forall ((v!1 Var) (l!1 Lab))\n(= (Ex0"
+    str += " v!1 l!1) (En0 v!1 l!1))))\n"
     return str
 
 def declareEnAndEx(labels):
     str = ""
     for label in labels:
         if label is not "?":
-            if int(label) is not 1:
+            if int(label) is not 0:
                 str += "(declare-fun En" + label
                 str += " (Var Lab) Bool)\n"
             str += "(declare-fun Ex" + label + " (Var Lab) Bool)\n"
