@@ -23,6 +23,10 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# Modified by Kevin Ray and Johnathan Bliss, March 2019
+# Changes made for EECS 743
+# Added the skip_stmt to the definition of a stmt
+
 from .imp_lexer import *
 from .combinators import *
 from .imp_ast import *
@@ -52,6 +56,7 @@ def stmt():
     return assign_stmt() | \
            if_stmt()     | \
            while_stmt()  | \
+           # Added skip_stmt
            skip_stmt()
 
 def assign_stmt():

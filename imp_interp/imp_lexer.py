@@ -23,6 +23,10 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# Modified by Kevin Ray and Johnathan Bliss, March 2019
+# Changes made for EECS 743
+# Added token for skip command
+
 from .lexer import *
 
 RESERVED = 'RESERVED'

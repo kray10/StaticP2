@@ -23,7 +23,18 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Removed add eval functions as they are not necessary for reaching
+# Modified by Kevin Ray and Johnathan Bliss, March 2019
+# Changes made for EECS 743
+# Removed eval functions for all classes as they are not necessary for reaching.
+# Added the label member variable and the getLabel function to the classes to
+#   track the labeling.
+# In conjunction with label variable, added the assignLabel function to each
+#   class that is associated with the reaching definition.
+# Added the genZ3 function to each class that is associated with the reaching
+#   definition
+# Added a new class defintion to encapsulate the skip command statement.
+# Modified getVars function to return all variables on both sides of the assignment.
+
 from .equality import *
 
 class Statement(Equality):
