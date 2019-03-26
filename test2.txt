@@ -5,4 +5,5 @@ if 1 < Y then
 else
   Z := 3
 end;
+X := Y;
 skip
