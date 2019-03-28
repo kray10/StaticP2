@@ -1,7 +1,0 @@
-Y := X;
-Z := 1;
-while 1<Y do
-  Z := Z + Y;
-  Y := Y - 1
-end;
-Y := 0
