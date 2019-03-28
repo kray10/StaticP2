@@ -56,7 +56,6 @@ def stmt():
     return assign_stmt() | \
            if_stmt()     | \
            while_stmt()  | \
-           # Added skip_stmt
            skip_stmt()
 
 def assign_stmt():
